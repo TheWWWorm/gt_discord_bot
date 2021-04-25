@@ -15,12 +15,14 @@ client.on('ready', () => {
 
 let unlocked = true;
 
-function checkLock(arg: string) {
+function checkLock(arg: string, msg: Discord.Message) {
   if (arg === process.env.LOCK_SECRET) {
     console.log('Recieved lock command, bot is locking!');
+    msg.react('✅');
     unlocked = false;
   } else if (arg === process.env.UNLOCK_SECRET) {
     unlocked = true
+    msg.react('✅');
     console.log('Recieved unlock command, bot is unlocking!');
   };
   return unlocked;
@@ -29,7 +31,7 @@ function checkLock(arg: string) {
 client.on('message', msg => {
   const args = msg.content.split(' ');
   const greet = args.shift().toLocaleLowerCase();
-  if (!checkLock(greet)) {
+  if (!checkLock(greet, msg)) {
     return;
   }
   if (~msgStart.indexOf(greet)) {
