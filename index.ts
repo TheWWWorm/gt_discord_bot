@@ -13,9 +13,25 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
 })
 
+let unlocked = true;
+
+function checkLock(arg: string) {
+  if (arg === process.env.LOCK_SECRET) {
+    console.log('Recieved lock command, bot is locking!');
+    unlocked = false;
+  } else if (arg === process.env.UNLOCK_SECRET) {
+    unlocked = true
+    console.log('Recieved unlock command, bot is unlocking!');
+  };
+  return unlocked;
+}
+
 client.on('message', msg => {
   const args = msg.content.split(' ');
   const greet = args.shift().toLocaleLowerCase();
+  if (!checkLock(greet)) {
+    return;
+  }
   if (~msgStart.indexOf(greet)) {
     const command = args.shift().toLowerCase();
     if (cmdResolver[command]) {
@@ -23,7 +39,7 @@ client.on('message', msg => {
     }
   } else if (greet.length > 15 && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
     cmdResolver.cat(msg);
-  }
+  };
 });
 
 client.login(TOKEN);
