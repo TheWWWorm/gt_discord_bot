@@ -39,7 +39,7 @@ client.on('message', msg => {
     if (cmdResolver[command]) {
       cmdResolver[command](msg, ...args);
     }
-  } else if (greet.length > 15 && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
+  } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
     cmdResolver.cat(msg);
   };
 });
