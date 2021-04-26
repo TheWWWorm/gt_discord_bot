@@ -13,10 +13,11 @@
     "animal-ids": "^1.0.1",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
+    "node-ts": "5.1.1",
+    "nodemon": "2.0.7",
     "typescript": "^4.2.4"
   },
   "devDependencies": {
-    "@types/node": "^14.14.41",
-    "nodemon": "2.0.7"
+    "@types/node": "^14.14.41"
   }
 }
