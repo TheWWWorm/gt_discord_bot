@@ -7,7 +7,7 @@ import cmdResolver from './commands';
 const client = new Discord.Client()
 
 const TOKEN = process.env.DISCORD_TOKEN;
-const msgStart = ['gib', 'geben', 'git', 'sudo'];
+const msgStart = ['give', 'gib', 'geben', 'git', 'sudo'];
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
