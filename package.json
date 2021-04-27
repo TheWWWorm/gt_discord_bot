@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node-ts index.ts",
+    "pm2": "pm2 start index.ts --watch",
+    "tsc": "tsc src/index.ts -w & pm2 start dist/index.js --watch"
+  },
+  "nodemonConfig": {
+    "ext": "ts"
   },
   "keywords": [],
   "author": "WWWorm",

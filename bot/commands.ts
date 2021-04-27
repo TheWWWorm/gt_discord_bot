@@ -1,10 +1,10 @@
 import Discord from 'discord.js';
 import animalIds from 'animal-ids';
+import coopWatcher from './room-watcher';
 
 const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
 const coopChannelID = process.env.COOP_CHANNEL_ID;
 const catRoleID = process.env.CAT_ROLE_ID;
-const coopChannelDeleteIn = 1e3 * 60 * minutesUntilDeletion;
 
 function getRngCalculator(chance) {
   return (msg: Discord.Message, rolls) => {
@@ -27,17 +27,10 @@ const commands = {
       })
     }).then((ch) => {
       msg.reply(`Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`);
-      function sheduleTheDeletion() {
-        setTimeout(() => {
-          console.log(Date.now(), ch.lastMessage?.createdTimestamp);
-          if (!ch.lastMessage?.createdTimestamp || Date.now() - ch.lastMessage?.createdTimestamp > coopChannelDeleteIn) {
-            ch.delete()
-          } else {
-            sheduleTheDeletion();
-          }
-        }, coopChannelDeleteIn)
-      };
-      sheduleTheDeletion();
+      coopWatcher.addRoom({
+        channelId: ch.id,
+        guildId: ch.guild.id
+      })
     }).catch(console.error);
   },
   ping: (msg: Discord.Message) => {
