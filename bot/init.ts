@@ -2,7 +2,7 @@ import Discord from 'discord.js';
 import { commandHandlers, createCoopRoom } from './commands';
 import client from './login';
 
-// @TODO: move this to separate file
+// @TODO: move this to separate file and fix the broken typing
 // @NOTE: typing for commands API is lacking, so everything is more or less typed as any
 function initCommands() {
   console.log('Guild id is', process.env.GUILD_ID);
