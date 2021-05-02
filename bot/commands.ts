@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import animalIds from 'animal-ids';
 import coopWatcher from './room-watcher';
+import client from './login';
 
 const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
 const coopChannelID = process.env.COOP_CHANNEL_ID;
@@ -18,25 +19,38 @@ function getRngCalculator(chance: number) {
   }
 }
 
+export const createCoopRoom = (guildId: string): Promise<string> => {
+  const guild = new Discord.Guild(client, {
+    id: guildId
+  });
+  const guildChannelManager = new Discord.GuildChannelManager(guild);
+  const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
+  // Create new co-op channel under defined catergory
+  return guildChannelManager.create(roomName, {
+    parent: new Discord.Channel(client, {
+      id: coopChannelID
+    })
+  }).then((ch) => {
+    // Initiate the room watcher, so it will get deleted after some time of inactivity
+    coopWatcher.addRoom({
+      channelId: ch.id,
+      guildId: ch.guild.id
+    });
+    return `Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`;
+  }).catch((err) => {
+    console.error(err);
+    return 'Errored during room creation!';
+  });
+}
+
+// @TODO: rewrite, so commands won't depend on Discord.Message, they should just take required params, so they can work with commands!
 // List of available bot commands
 // If new command added to object below, it will automatically work
 const commands = {
   coop: (msg: Discord.Message) => {
-    const guildChannelManager = new Discord.GuildChannelManager(msg.guild);
-    const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
-    // Create new co-op channel under defined catergory
-    guildChannelManager.create(roomName, {
-      parent: new Discord.Channel(msg.client, {
-        id: coopChannelID
-      })
-    }).then((ch) => {
-      msg.reply(`Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`);
-      // Initiate the room watcher, so it will get deleted after some time of inactivity
-      coopWatcher.addRoom({
-        channelId: ch.id,
-        guildId: ch.guild.id
-      })
-    }).catch(console.error);
+    createCoopRoom(msg.guild.id).then((coopResultText) => {
+      msg.reply(coopResultText);
+    });
   },
   ping: (msg: Discord.Message) => {
     msg.reply("pong");
@@ -71,4 +85,4 @@ const commands = {
   }
 };
 
-export default commands;
+export const commandHandlers = commands;
