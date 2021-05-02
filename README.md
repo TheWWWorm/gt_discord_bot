@@ -1,8 +1,8 @@
 # Guardian Tales discord bot
-Bot that has a few nice commans, for use on GT discord server
+Bot that has a few nice commans for use in GT discord server
 ## Install
 
-* Dowload and isntall latest vesrsion of node.js from https://nodejs.org/
+* Dowload and install latest version of node.js from https://nodejs.org/
 * After that, navigate to the root of the projects folder and execute the following commands
 
 ```
@@ -14,9 +14,10 @@ $ npm install -g ts-node
 * Fill in all the missing values in `.env` file
 
 ## Use
-Execute the following command in the root of the projects folder. This will run the bot server and also watch the file system, and automatically restarting the server if any changes are made.
+Execute the following command in the root of the projects folder.
 ```
 $ nodemon index.ts
 ```
+This will run the bot server and will also watch the file system, automatically restarting the server if any changes are made.
 
 
