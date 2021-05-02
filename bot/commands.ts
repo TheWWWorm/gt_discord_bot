@@ -6,7 +6,8 @@ const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIV
 const coopChannelID = process.env.COOP_CHANNEL_ID;
 const catRoleID = process.env.CAT_ROLE_ID;
 
-function getRngCalculator(chance) {
+// Function for creating rng based calculation functions
+function getRngCalculator(chance: number) {
   return (msg: Discord.Message, rolls) => {
     rolls = Math.floor(Number(rolls));
     if (!rolls || rolls < 1) {
@@ -17,16 +18,20 @@ function getRngCalculator(chance) {
   }
 }
 
+// List of available bot commands
+// If new command added to object below, it will automatically work
 const commands = {
   coop: (msg: Discord.Message) => {
     const guildChannelManager = new Discord.GuildChannelManager(msg.guild);
     const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
+    // Create new co-op channel under defined catergory
     guildChannelManager.create(roomName, {
       parent: new Discord.Channel(msg.client, {
         id: coopChannelID
       })
     }).then((ch) => {
       msg.reply(`Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`);
+      // Initiate the room watcher, so it will get deleted after some time of inactivity
       coopWatcher.addRoom({
         channelId: ch.id,
         guildId: ch.guild.id
@@ -49,9 +54,9 @@ const commands = {
     msg.reply(animalIds.generateID(length, ' '));
   },
   help: (msg: Discord.Message) => {
+    // Get all the avalable commands from this objects keys/properties
     msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test'].indexOf(name) === -1).join(', ')}`);
   },
-  // TODO: allow for rng of banner units(note, that regular boxes can also result in banner stuff), weapon summons
   whitebox: getRngCalculator(1.375 * 2),
   bannerbox: getRngCalculator(1.375),
   exwhitebox: getRngCalculator(1 + 2),
