@@ -98,7 +98,7 @@ class RoomWatcher {
 
   // Add new room to watch list/file
   removeRoom(id: string) {
-    this.rooms = rooms.filter((room) => room.channelId !== id);
+    this.rooms = this.rooms.filter((room) => room.channelId !== id);
     syncRooms(this.rooms);
   }
 }
