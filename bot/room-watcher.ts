@@ -67,9 +67,9 @@ class RoomWatcher {
             console.log('Comparing messages', Date.now(), msgStamp, message?.content);
             // If no message were made, or message was a long enough time ago - delete the room
             if (!msgStamp || Date.now() - msgStamp > coopChannelDeleteIn) {
-              console.log('Deleting channel', channel.id)
-              channel.delete()
+              console.log('Deleting channel', channel.id);
               this.removeRoom(channel.id);
+              channel.delete();
             // If the above check fails, shedule a new check in the future
             } else {
               sheduleTheDeletion();
