@@ -87,6 +87,7 @@ export function start() {
     if (!checkLock(greet, msg)) {
       return;
     }
+    commandHandlers.whaleCheck(msg);
     // If message starts with valid greeting - continue
     if (~msgStart.indexOf(greet)) {
       const command = args.shift().toLowerCase();

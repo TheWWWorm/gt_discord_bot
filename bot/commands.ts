@@ -7,6 +7,9 @@ const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIV
 const coopChannelID = process.env.COOP_CHANNEL_ID;
 const catRoleID = process.env.CAT_ROLE_ID;
 
+const whaleChannelID = process.env.WHALE_CHANNEL_ID;
+const whaleRoleID = process.env.WHALE_ROLE_ID;
+
 // Function for creating rng based calculation functions
 function getRngCalculator(chance: number) {
   return (msg: Discord.Message, rolls) => {
@@ -69,7 +72,14 @@ const commands = {
   },
   help: (msg: Discord.Message) => {
     // Get all the avalable commands from this objects keys/properties
-    msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test'].indexOf(name) === -1).join(', ')}`);
+    msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test', 'whaleCheck'].indexOf(name) === -1).join(', ')}`);
+  },
+  whaleCheck: (msg: Discord.Message) => {
+    if (msg.channel.id === whaleChannelID) {
+      const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
+      // Set whale role
+      RoleManager.add([whaleRoleID]).catch(console.error);
+    }
   },
   whitebox: getRngCalculator(1.375 * 2),
   bannerbox: getRngCalculator(1.375),
