@@ -68,7 +68,8 @@ const commands = {
     msg.reply('Cat alert!');
   },
   animal: (msg, length = 3) => {
-    msg.reply(animalIds.generateID(length, ' '));
+    const generated =  animalIds.generateID(length, ' ');
+    msg.reply(generated.substr(0, 1500));
   },
   help: (msg: Discord.Message) => {
     // Get all the avalable commands from this objects keys/properties
