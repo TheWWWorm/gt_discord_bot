@@ -69,7 +69,12 @@ const commands = {
   },
   animal: (msg, length = 3) => {
     const generated =  animalIds.generateID(length, ' ');
-    msg.reply(generated.substr(0, 1500));
+    if (generated.length > 1500) {
+      const goodThings = /(.*?)\S*?$/.exec(generated.substr(0, 1500))[1];
+      const animalName = /\s(\S*?)$/.exec(generated)[1];
+      return msg.reply(goodThings + animalName);
+    }
+    msg.reply(generated);
   },
   help: (msg: Discord.Message) => {
     // Get all the avalable commands from this objects keys/properties
