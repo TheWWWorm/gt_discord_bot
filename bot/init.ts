@@ -80,25 +80,29 @@ export function start() {
   }
 
   client.on('message', msg => {
-    // Split message into arguments
-    const args = msg.content.split(' ');
-    const greet = args.shift().toLocaleLowerCase();
-    // Return if we are locked
-    if (!checkLock(greet, msg)) {
-      return;
-    }
-    commandHandlers.whaleCheck(msg);
-    // If message starts with valid greeting - continue
-    if (~msgStart.indexOf(greet)) {
-      const command = args.shift().toLowerCase();
-      // In commands exists - execute if with the rest of arguments
-      if (commandHandlers[command]) {
-        commandHandlers[command](msg, ...args);
+    try {
+      // Split message into arguments
+      const args = msg.content.split(' ');
+      const greet = args.shift().toLocaleLowerCase();
+      // Return if we are locked
+      if (!checkLock(greet, msg)) {
+        return;
       }
-    // If message fits the "cat" ctiteriea, execute the cat command
-    } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
-      commandHandlers.cat(msg);
-    };
+      commandHandlers.whaleCheck(msg);
+      // If message starts with valid greeting - continue
+      if (~msgStart.indexOf(greet)) {
+        const command = args.shift().toLowerCase();
+        // In commands exists - execute if with the rest of arguments
+        if (commandHandlers[command]) {
+          commandHandlers[command](msg, ...args);
+        }
+      // If message fits the "cat" ctiteriea, execute the cat command
+      } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
+        commandHandlers.cat(msg);
+      };
+    } catch (e) {
+      console.log('Errored during msg parse', e.stack);
+    }
   });
 }
 
