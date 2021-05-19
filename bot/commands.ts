@@ -2,6 +2,7 @@ import Discord from 'discord.js';
 import animalIds from 'animal-ids';
 import coopWatcher from './room-watcher';
 import client from './login';
+import { checkCafeUrls } from '../news-check/cafe-checker';
 
 const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
 const coopChannelID = process.env.COOP_CHANNEL_ID;
@@ -50,6 +51,11 @@ export const createCoopRoom = (guildId: string): Promise<string> => {
 // List of available bot commands
 // If new command added to object below, it will automatically work
 const commands = {
+  koreanews: (msg: Discord.Message) => {
+    checkCafeUrls().then((url) => {
+      msg.reply(`Latest korea news, posted at ${url.date}. ${url.url}`);
+    });
+  },
   coop: (msg: Discord.Message) => {
     createCoopRoom(msg.guild.id).then((coopResultText) => {
       msg.reply(coopResultText);

@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import { startCafeNewsCron } from '../news-check/cafe-checker';
 import { commandHandlers, createCoopRoom } from './commands';
 import client from './login';
 
@@ -54,6 +55,20 @@ function initCommands() {
 export function start() {
   const msgStart = process.env.BOT_PREFIXES.split(',');
   console.log('Available prefixes are:', msgStart.join(', '));
+
+  console.log('Starting cafe news cron');
+  startCafeNewsCron((res) => {
+    if (res) {
+      const msg = `Latest korea news, posted at ${res.date}. ${res.url}`;
+      const guild = new Discord.Guild(client, {
+        id: process.env.GUILD_ID
+      });
+      const channel = new Discord.TextChannel(guild, {
+        id: process.env.NEWS_CHANNEL_ID
+      });
+      channel.send(msg);
+    }
+  })
 
   client.on('ready', () => {
     client.user.setActivity(`${msgStart[0]} help`)
