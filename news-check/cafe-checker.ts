@@ -1,6 +1,9 @@
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs';
+import log4js from 'log4js'
+
+const logger = log4js.getLogger('Cafe checker');
 
 const baseUrl = 'https://m.cafe.daum.net';
 const gtCafeUlr = '/GuardianTales/ARyY';
@@ -12,7 +15,7 @@ const cafeUrlFileName = path.join(__dirname + '/cafe-urls.json');
 function syncCafeUrls(obj) {
   fs.writeFile(cafeUrlFileName, JSON.stringify(obj), (err) => {
     if (err) {
-      console.error('Errored while trying to update the cafe-urls file', err.stack);
+      logger.error('Errored while trying to update the cafe-urls file', err.stack);
     }
   });
 }
@@ -55,7 +58,7 @@ export function checkCafeUrls(write = false): Promise<CafeNewsType> {
     }
     return null;
   }).catch((err) => {
-    console.error(`Errored during the fetch of ${baseUrl + gtCafeUlr}`, err.stack)
+    logger.error(`Errored during the fetch of ${baseUrl + gtCafeUlr}`, err.stack)
     return null;
   });
 }

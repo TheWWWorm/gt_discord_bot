@@ -2,11 +2,14 @@ import Discord from 'discord.js';
 import { startCafeNewsCron } from '../news-check/cafe-checker';
 import { commandHandlers, createCoopRoom } from './commands';
 import client from './login';
+import log4js from 'log4js'
+
+const logger = log4js.getLogger('Init');
 
 // @TODO: move this to separate file and fix the broken typing
 // @NOTE: typing for commands API is lacking, so everything is more or less typed as any
 function initCommands() {
-  console.log('Guild id is', process.env.GUILD_ID);
+  logger.info('Guild id is', process.env.GUILD_ID);
   // Wrap app in fn, because we need a new instance every time
   function getApp(guildId = process.env.GUILD_ID) {
     const app = client['api']['applications'](client.user.id);
@@ -29,7 +32,7 @@ function initCommands() {
 
   // Check existing commands
   getApp().commands.get().then((cmd) => {
-    console.log(cmd);
+    logger.info(cmd);
     // Post new commands
     return getApp().commands.post({
       data: {
@@ -38,8 +41,8 @@ function initCommands() {
       }
     })
   }).then((updated) => {
-    console.log(updated)
-  }).catch((err) => console.error('Errored', err));
+    logger.info(updated)
+  }).catch((err) => logger.error('Errored', err));
 
   // Listen to commands
   client.ws.on('INTERACTION_CREATE' as any, (interatcion: any) => {
@@ -54,10 +57,10 @@ function initCommands() {
 
 export function start() {
   const msgStart = process.env.BOT_PREFIXES.split(',');
-  console.log('Available prefixes are:', msgStart.join(', '));
+  logger.info('Available prefixes are:', msgStart.join(', '));
 
   if (process.env.NEWS_CHANNEL_ID) {
-    console.log('Starting cafe news cron');
+    logger.info('Starting cafe news cron');
     startCafeNewsCron((res) => {
       if (res) {
         const msg = `Latest korea news, posted at ${res.date}. Use browser translator to read. ${res.url}`;
@@ -74,7 +77,7 @@ export function start() {
 
   client.on('ready', () => {
     client.user.setActivity(`${msgStart[0]} help`)
-    console.log(`Logged in as ${client.user.tag}!`)
+    logger.info(`Logged in as ${client.user.tag}!`)
     initCommands();
   })
 
@@ -85,13 +88,13 @@ export function start() {
   // Bots should have different lock/unlock commands
   function checkLock(arg: string, msg: Discord.Message) {
     if (arg === process.env.LOCK_SECRET) {
-      console.log('Recieved lock command, bot is locking!');
+      logger.info('Recieved lock command, bot is locking!');
       msg.react('✅');
       unlocked = false;
     } else if (arg === process.env.UNLOCK_SECRET) {
       unlocked = true
       msg.react('✅');
-      console.log('Recieved unlock command, bot is unlocking!');
+      logger.info('Recieved unlock command, bot is unlocking!');
     };
     return unlocked;
   }
@@ -118,7 +121,7 @@ export function start() {
         commandHandlers.cat(msg);
       };
     } catch (e) {
-      console.log('Errored during msg parse', e.stack);
+      logger.error('Errored during msg parse', e.stack);
     }
   });
 }

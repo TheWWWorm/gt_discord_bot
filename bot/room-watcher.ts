@@ -2,6 +2,9 @@ import Discord from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import client from './login';
+import log4js from 'log4js'
+
+const logger = log4js.getLogger('Room watcher');
 
 type Room = {
   guildId: string,
@@ -15,7 +18,7 @@ const roomFileName = path.join(__dirname + '/rooms.json');
 function syncRooms(obj) {
   fs.writeFile(roomFileName, JSON.stringify(obj), (err) => {
     if (err) {
-      console.error('Errored while trying to update the coop rooms file', err.stack);
+      logger.error('Errored while trying to update the coop rooms file', err.stack);
     }
   });
 }
@@ -64,10 +67,10 @@ class RoomWatcher {
           }).then((messages) => {
             const message = messages.last();
             const msgStamp = message?.createdTimestamp
-            console.log('Comparing messages', Date.now(), msgStamp, message?.content);
+            logger.info('Comparing messages', Date.now(), msgStamp, message?.content);
             // If no message were made, or message was a long enough time ago - delete the room
             if (!msgStamp || Date.now() - msgStamp > coopChannelDeleteIn) {
-              console.log('Deleting channel', channel.id);
+              logger.info('Deleting channel', channel.id);
               this.removeRoom(channel.id);
               channel.delete();
             // If the above check fails, shedule a new check in the future
@@ -76,7 +79,7 @@ class RoomWatcher {
             }
           }).catch((err) => {
             // If errored - room was most likely deleted
-            console.log(`Message fetch failed, deleting room ${room.channelId}`, err.stack);
+            logger.error(`Message fetch failed, deleting room ${room.channelId}`, err.stack);
             this.removeRoom(room.channelId);
           })
         }, interval);
@@ -84,7 +87,7 @@ class RoomWatcher {
       // Init the watching
       sheduleTheDeletion(coopChannelDeleteIn);
     } catch (err) {
-      console.log(`Errored during coop room watcher init, deleting room ${room.channelId}`, err.stack);
+      logger.error(`Errored during coop room watcher init, deleting room ${room.channelId}`, err.stack);
       this.removeRoom(room.channelId);
     }
   }

@@ -4,6 +4,9 @@ import coopWatcher from './room-watcher';
 import client from './login';
 import { checkCafeUrls } from '../news-check/cafe-checker';
 import { genMaths } from './maths';
+import log4js from 'log4js'
+
+const logger = log4js.getLogger('Commands');
 
 const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
 const coopChannelID = process.env.COOP_CHANNEL_ID;
@@ -43,7 +46,7 @@ export const createCoopRoom = (guildId: string): Promise<string> => {
     });
     return `Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`;
   }).catch((err) => {
-    console.error(err);
+    logger.error(err);
     return 'Errored during room creation!';
   });
 }
@@ -71,7 +74,7 @@ const commands = {
   cat: (msg: Discord.Message) => {
     const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
     // Set cat role
-    RoleManager.add([catRoleID]).catch(console.error);
+    RoleManager.add([catRoleID]).catch(logger.error);
     msg.reply('Cat alert!');
   },
   animal: (msg, length = 3) => {
@@ -91,7 +94,7 @@ const commands = {
     if (msg.channel.id === whaleChannelID) {
       const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
       // Set whale role
-      RoleManager.add([whaleRoleID]).catch(console.error);
+      RoleManager.add([whaleRoleID]).catch(logger.error);
     }
   },
   whitebox: getRngCalculator(1.375 * 2),
