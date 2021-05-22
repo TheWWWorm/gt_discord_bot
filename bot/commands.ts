@@ -3,6 +3,7 @@ import animalIds from 'animal-ids';
 import coopWatcher from './room-watcher';
 import client from './login';
 import { checkCafeUrls } from '../news-check/cafe-checker';
+import { genMaths } from './maths';
 
 const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
 const coopChannelID = process.env.COOP_CHANNEL_ID;
@@ -104,6 +105,21 @@ const commands = {
     }
     const reduction = (1 - 1 / (amount / 100 + 1)) * 100;
     msg.reply(`With ${amount} defence, damage is reduced by ${reduction.toFixed(2)}%`);
+  },
+  maths: (msg: Discord.Message, target, difficulty = 10) => {
+    try {
+      target = Number(target);
+      difficulty = difficulty = Math.min(Number(difficulty), 1000);
+      if (!target) {
+        return msg.reply('I need a valid target number!');
+      }
+      if (!difficulty) {
+        return msg.reply('I need a valid difficulty number!');
+      }
+      msg.channel.send(genMaths(target, difficulty));
+    } catch (e) {
+      msg.reply('Errored during formula generation!');
+    }
   }
 };
 

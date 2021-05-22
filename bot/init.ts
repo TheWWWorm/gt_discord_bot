@@ -56,19 +56,21 @@ export function start() {
   const msgStart = process.env.BOT_PREFIXES.split(',');
   console.log('Available prefixes are:', msgStart.join(', '));
 
-  console.log('Starting cafe news cron');
-  startCafeNewsCron((res) => {
-    if (res) {
-      const msg = `Latest korea news, posted at ${res.date}. Use browser translator to read. ${res.url}`;
-      const guild = new Discord.Guild(client, {
-        id: process.env.GUILD_ID
-      });
-      const channel = new Discord.TextChannel(guild, {
-        id: process.env.NEWS_CHANNEL_ID
-      });
-      channel.send(msg);
-    }
-  })
+  if (process.env.NEWS_CHANNEL_ID) {
+    console.log('Starting cafe news cron');
+    startCafeNewsCron((res) => {
+      if (res) {
+        const msg = `Latest korea news, posted at ${res.date}. Use browser translator to read. ${res.url}`;
+        const guild = new Discord.Guild(client, {
+          id: process.env.GUILD_ID
+        });
+        const channel = new Discord.TextChannel(guild, {
+          id: process.env.NEWS_CHANNEL_ID
+        });
+        channel.send(msg);
+      }
+    })
+  }
 
   client.on('ready', () => {
     client.user.setActivity(`${msgStart[0]} help`)
@@ -112,7 +114,7 @@ export function start() {
           commandHandlers[command](msg, ...args);
         }
       // If message fits the "cat" ctiteriea, execute the cat command
-      } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet)) {
+      } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet) && !/[\*\/\+-]/m.test(greet)) {
         commandHandlers.cat(msg);
       };
     } catch (e) {
