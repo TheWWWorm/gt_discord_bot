@@ -6,6 +6,8 @@ import log4js from 'log4js'
 
 const logger = log4js.getLogger('Init');
 
+logger.info('Running in prod mode - ', process.env.PROD === 'true');
+
 // @TODO: move this to separate file and fix the broken typing
 // @NOTE: typing for commands API is lacking, so everything is more or less typed as any
 function initCommands() {

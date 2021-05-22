@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import log4js from 'log4js'
-console.log(process.env.PROD === 'true');
+
 log4js.configure({
   appenders: {
     console: { type: 'console', layout: { type: 'colored' } },
