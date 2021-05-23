@@ -119,7 +119,7 @@ const commands = {
       if (!difficulty) {
         return msg.reply('I need a valid difficulty number!');
       }
-      msg.channel.send(genMaths(target, difficulty));
+      msg.channel.send(`\`${genMaths(target, difficulty)}\``);
     } catch (e) {
       msg.reply('Errored during formula generation!');
     }
