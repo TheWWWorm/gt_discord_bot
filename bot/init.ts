@@ -65,7 +65,7 @@ export function start() {
     logger.info('Starting cafe news cron');
     startCafeNewsCron((res) => {
       if (res) {
-        const msg = `Latest korea news, posted at ${res.date}. Use browser translator to read. ${res.url}`;
+        const msg = `Latest korea news, posted at ${res.date}. ${res.url}`;
         const guild = new Discord.Guild(client, {
           id: process.env.GUILD_ID
         });

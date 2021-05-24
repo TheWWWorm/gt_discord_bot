@@ -35,7 +35,7 @@ export type CafeNewsType = {
   date: string;
 }
 
-export function checkCafeUrls(write = false): Promise<CafeNewsType> {
+export function checkCafeUrls(write = false, translated = true): Promise<CafeNewsType> {
   return axios.get(baseUrl + gtCafeUlr, {}).then((res) => {
     const body = res.data;
     if (body) {
@@ -43,7 +43,7 @@ export function checkCafeUrls(write = false): Promise<CafeNewsType> {
       const date = /<span class="created_at">(\d{2}\.\d{2}\.\d{2})<\/span>/m.exec(res.data)[1]
       const [year, month, day] = date.split('.'); 
       const returnObj = {
-        url,
+        url: translated ? 'https://translate.google.com/translate?hl=en&sl=ko&tl=en&u=' + encodeURIComponent(url): url,
         date: new Date(Number('20' + year), +month - 1, Number(day)).toDateString()
       };
       if (write) {
