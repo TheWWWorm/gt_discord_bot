@@ -123,6 +123,11 @@ const commands = {
     } catch (e) {
       msg.reply('Errored during formula generation!');
     }
+  },
+  dice: (msg: Discord.Message, sides = 6, min = 1) => {
+    sides = Number(sides);
+    min = Number(min);
+    msg.reply(`Dice roll result is ${Math.floor(Math.random() * (sides - min + 1)) + min}`);
   }
 };
 
