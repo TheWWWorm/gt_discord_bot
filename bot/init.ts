@@ -3,17 +3,19 @@ import { startCafeNewsCron } from '../news-check/cafe-checker';
 import { commandHandlers, createCoopRoom } from './commands';
 import client from './login';
 import log4js from 'log4js'
+import { startKamazoneCron } from './kamazone-cron';
+import config from '../config';
 
 const logger = log4js.getLogger('Init');
 
-logger.info('Running in prod mode - ', process.env.PROD === 'true');
+logger.info('Running in prod mode - ', config.get('isProd'));
 
 // @TODO: move this to separate file and fix the broken typing
 // @NOTE: typing for commands API is lacking, so everything is more or less typed as any
-function initCommands() {
-  logger.info('Guild id is', process.env.GUILD_ID);
+function initCommands(guildID) {
+  logger.info('Guild id is', guildID);
   // Wrap app in fn, because we need a new instance every time
-  function getApp(guildId = process.env.GUILD_ID) {
+  function getApp(guildId = guildID) {
     const app = client['api']['applications'](client.user.id);
     if (guildId) {
       app.guilds(guildId);
@@ -58,58 +60,61 @@ function initCommands() {
 }
 
 export function start() {
-  const msgStart = process.env.BOT_PREFIXES.split(',');
+  const msgStart = config.get('botPrefixes') as Array<string>
   logger.info('Available prefixes are:', msgStart.join(', '));
 
-  if (process.env.NEWS_CHANNEL_ID) {
-    logger.info('Starting cafe news cron');
-    startCafeNewsCron((res) => {
-      if (res) {
+  logger.info('Starting cafe news cron');
+  startCafeNewsCron((res) => {
+    if (res) {
+      const channels = config.getGuildValuePair('newsChannelID');
+      channels.forEach(([guildID, newsChannelID]) => {
         const msg = `Latest korea news, posted at ${res.date}. ${res.url}`;
         const guild = new Discord.Guild(client, {
-          id: process.env.GUILD_ID
+          id: guildID
         });
         const channel = new Discord.TextChannel(guild, {
-          id: process.env.NEWS_CHANNEL_ID
+          id: newsChannelID
         });
         channel.send(msg);
-      }
-    })
-  }
+      });
+    }
+  })
+
+  logger.info('Starting kamazone news cron');
+  startKamazoneCron((res) => {
+    if (res) {
+      const channels = config.getGuildValuePair('kamazoneMentionChannelID');
+      channels.forEach(([guildID, newsChannelID]) => {
+        const roleID = config.getGuild(guildID, 'kamazoneRoleID');
+        const msg = `${roleID ? `<@&${roleID}>` : 'Unset role!'} Don't forget to do Kama-ZONE! ${res.toFixed(1)} hours left until the round end!`;
+        const guild = new Discord.Guild(client, {
+          id: guildID
+        });
+        const channel = new Discord.TextChannel(guild, {
+          id: newsChannelID
+        });
+        channel.send(msg);
+      });
+    }
+  })
 
   client.on('ready', () => {
     client.user.setActivity(`${msgStart[0]} help`)
     logger.info(`Logged in as ${client.user.tag}!`)
-    initCommands();
+    const guildIDs = config.getGuildValuePair('ID');
+    guildIDs.forEach(([guildID]) => {
+      initCommands(guildID);
+    });
   })
 
-  let unlocked = true;
-
-  // Allows bot "disabling" for delepment purposes
-  // So 2 bots can co-exist without replying to the same message twice) 
-  // Bots should have different lock/unlock commands
-  function checkLock(arg: string, msg: Discord.Message) {
-    if (arg === process.env.LOCK_SECRET) {
-      logger.info('Recieved lock command, bot is locking!');
-      msg.react('✅');
-      unlocked = false;
-    } else if (arg === process.env.UNLOCK_SECRET) {
-      unlocked = true
-      msg.react('✅');
-      logger.info('Recieved unlock command, bot is unlocking!');
-    };
-    return unlocked;
-  }
-
   client.on('message', msg => {
+    if (msg.author.bot) {
+      return;
+    }
     try {
       // Split message into arguments
       const args = msg.content.split(' ');
       const greet = args.shift().toLocaleLowerCase();
-      // Return if we are locked
-      if (!checkLock(greet, msg)) {
-        return;
-      }
       commandHandlers.whaleCheck(msg);
       // If message starts with valid greeting - continue
       if (~msgStart.indexOf(greet)) {
@@ -119,7 +124,7 @@ export function start() {
           commandHandlers[command](msg, ...args);
         }
       // If message fits the "cat" ctiteriea, execute the cat command
-      } else if (greet.length > Number(process.env.CAT_TRIGGER_LENGTH) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet) && !/[\*\/\+-]/m.test(greet)) {
+      } else if (greet.length > Number(config.get('catMsgLenght')) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet) && !/[\*\/\+-]/m.test(greet)) {
         commandHandlers.cat(msg);
       };
     } catch (e) {

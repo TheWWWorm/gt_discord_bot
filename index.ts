@@ -2,6 +2,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import log4js from 'log4js'
+import config from './config';
+
+process.env.TZ = 'Etc/UTC'
 
 log4js.configure({
   appenders: {
@@ -16,7 +19,7 @@ log4js.configure({
   categories: {
     default: { appenders: ['console'], level: 'debug' }
   },
-  pm2: process.env.PROD === 'true'
+  pm2: config.get('isProd') as boolean
 });
 // Start the bot
 import { start } from './bot/init';

@@ -1,34 +1,14 @@
 import axios from 'axios';
-import path from 'path';
-import fs from 'fs';
 import log4js from 'log4js'
+import { readDB, writeDB } from '../db/db_helper';
 
 const logger = log4js.getLogger('Cafe checker');
 
 const baseUrl = 'https://m.cafe.daum.net';
 const gtCafeUlr = '/GuardianTales/ARyY';
 
-// Path for the file that would contain the available cafe url
-const cafeUrlFileName = path.join(__dirname + '/cafe-urls.json');
-
-// Update the room file on the disk
-function syncCafeUrls(obj) {
-  fs.writeFile(cafeUrlFileName, JSON.stringify(obj), (err) => {
-    if (err) {
-      logger.error('Errored while trying to update the cafe-urls file', err.stack);
-    }
-  });
-}
-
-let cafeUrls: Array<string>;
-try {
-  // Read the room file from the disk
-  cafeUrls = JSON.parse(fs.readFileSync(cafeUrlFileName).toString());
-} catch (e) {
-  // If room file does not exist, create it
-  cafeUrls = [];
-  syncCafeUrls(cafeUrls);
-}
+const dbName = 'cafe-urls';
+let cafeUrls: Array<string> = readDB(dbName);
 
 export type CafeNewsType = {
   url: string;
@@ -49,7 +29,7 @@ export function checkCafeUrls(write = false, translated = true): Promise<CafeNew
       if (write) {
         if (!cafeUrls.includes(url)) {
           cafeUrls.push(url);
-          syncCafeUrls(cafeUrls);
+          writeDB('cafe-urls', cafeUrls);
           return returnObj;
         }
         return null

@@ -4,3 +4,4 @@ dist
 errors.log
 rooms.json
 cafe-urls.json
+config.json

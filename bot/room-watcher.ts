@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import client from './login';
 import log4js from 'log4js'
+import { readDB, writeDB } from '../db/db_helper';
+import config from '../config';
 
 const logger = log4js.getLogger('Room watcher');
 
@@ -11,29 +13,10 @@ type Room = {
   channelId: string
 }
 
-// Path for the file that would contain the available co-op room
-const roomFileName = path.join(__dirname + '/rooms.json');
+const dbName = 'rooms';
+let rooms: Array<Room> = readDB(dbName)
 
-// Update the room file on the disk
-function syncRooms(obj) {
-  fs.writeFile(roomFileName, JSON.stringify(obj), (err) => {
-    if (err) {
-      logger.error('Errored while trying to update the coop rooms file', err.stack);
-    }
-  });
-}
-
-let rooms: Array<Room>;
-try {
-  // Read the room file from the disk
-  rooms = JSON.parse(fs.readFileSync(roomFileName).toString());
-} catch (e) {
-  // If room file does not exist, create it
-  rooms = [];
-  syncRooms(rooms);
-}
-
-const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
+const minutesUntilDeletion: number = Number(config.get('coopMaxInaciveTime'));
 const coopChannelDeleteIn = 1e3 * 60 * minutesUntilDeletion;
 //const coopChannelDeleteIn = 1e3 * 5; // For quick testing
 
@@ -96,13 +79,13 @@ class RoomWatcher {
   addRoom(room: Room) {
     this.rooms.push(room);
     this.watch(room);
-    syncRooms(this.rooms);
+    writeDB(dbName, this.rooms);
   }
 
   // Add new room to watch list/file
   removeRoom(id: string) {
     this.rooms = this.rooms.filter((room) => room.channelId !== id);
-    syncRooms(this.rooms);
+    writeDB(dbName, this.rooms);
   }
 }
 

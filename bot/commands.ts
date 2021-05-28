@@ -1,19 +1,15 @@
-import Discord from 'discord.js';
+import Discord, { EmbedFieldData } from 'discord.js';
 import animalIds from 'animal-ids';
 import coopWatcher from './room-watcher';
 import client from './login';
 import { checkCafeUrls } from '../news-check/cafe-checker';
 import { genMaths } from './maths';
 import log4js from 'log4js'
+import config, { configHelp } from '../config';
 
 const logger = log4js.getLogger('Commands');
 
-const minutesUntilDeletion: number = Number(process.env.COOP_CHANNEL_MAX_INACTIVE_TIME);
-const coopChannelID = process.env.COOP_CHANNEL_ID;
-const catRoleID = process.env.CAT_ROLE_ID;
-
-const whaleChannelID = process.env.WHALE_CHANNEL_ID;
-const whaleRoleID = process.env.WHALE_ROLE_ID;
+const minutesUntilDeletion = config.get('coopMaxInaciveTime');
 
 // Function for creating rng based calculation functions
 function getRngCalculator(chance: number) {
@@ -31,6 +27,10 @@ export const createCoopRoom = (guildId: string): Promise<string> => {
   const guild = new Discord.Guild(client, {
     id: guildId
   });
+  const coopChannelID = config.getGuild(guildId, 'coopChannelID');
+  if (!coopChannelID) {
+    return Promise.resolve('No coopChannelID found for this discord server! Please run the setup!');
+  }
   const guildChannelManager = new Discord.GuildChannelManager(guild);
   const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
   // Create new co-op channel under defined catergory
@@ -50,6 +50,19 @@ export const createCoopRoom = (guildId: string): Promise<string> => {
     return 'Errored during room creation!';
   });
 }
+
+function objToEmbed(obj): Array<EmbedFieldData> {
+  return Object.keys(obj).map((key) => {
+    const embed: EmbedFieldData = {
+      name: key,
+      value: obj[key] || 'N/A'
+    }
+    return embed
+  });
+}
+
+const guildSetOptions = Object.keys(configHelp);
+const mappedEmbed: Array<EmbedFieldData> = objToEmbed(configHelp);
 
 // @TODO: rewrite, so commands won't depend on Discord.Message, they should just take required params, so they can work with commands!
 // List of available bot commands
@@ -72,6 +85,12 @@ const commands = {
     msg.reply("no");
   },
   cat: (msg: Discord.Message) => {
+    const guildId = msg.guild.id;
+    const catRoleID = config.getGuild(guildId, 'catRoleID');
+    console.log(catRoleID)
+    if (!catRoleID) {
+      return;
+    }
     const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
     // Set cat role
     RoleManager.add([catRoleID]).catch(logger.error);
@@ -91,6 +110,12 @@ const commands = {
     msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test', 'whaleCheck'].indexOf(name) === -1).join(', ')}`);
   },
   whaleCheck: (msg: Discord.Message) => {
+    const guildId = msg.guild.id;
+    const whaleChannelID = config.getGuild(guildId, 'whaleChannelID');
+    const whaleRoleID = config.getGuild(guildId, 'whaleRoleID');
+    if (!whaleChannelID || !whaleRoleID) {
+      return;
+    }
     if (msg.channel.id === whaleChannelID) {
       const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
       // Set whale role
@@ -128,6 +153,39 @@ const commands = {
     sides = Number(sides);
     min = Number(min);
     msg.reply(`Dice roll result is ${Math.floor(Math.random() * (sides - min + 1)) + min}`);
+  },
+  set:(msg: Discord.Message, name, value: string) => {
+    if (!msg.member.hasPermission("ADMINISTRATOR")) {
+      return msg.reply('You need to have admin rights to use this command')
+    }
+    if (!guildSetOptions.includes(name)) {
+      return msg.reply('You are trying to set unkown param! Please do give help setup, to check available commands!');
+    }
+    if (value) {
+      value = value.trim();
+    }
+    config.setGuild(msg.guild.id, name, value);
+    msg.react('✅');
+  },
+  setup:(msg: Discord.Message) => {
+    msg.reply({
+      title: 'Available "set" variables.',
+      embed: {
+        fields: mappedEmbed
+      }
+    })
+  },
+  checksetup:(msg: Discord.Message) => {
+    if (!msg.member.hasPermission("ADMINISTRATOR")) {
+      return msg.reply('You need to have admin rights to use this command')
+    }
+    const setup = config.getFullGuildConfig(msg.guild.id);
+    msg.reply({
+      title: 'Available "set" variables.',
+      embed: {
+        fields: objToEmbed(setup)
+      }
+    })
   }
 };
 
