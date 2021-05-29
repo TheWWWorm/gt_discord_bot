@@ -180,6 +180,9 @@ const commands = {
       return msg.reply('You need to have admin rights to use this command')
     }
     const setup = config.getFullGuildConfig(msg.guild.id);
+    if (!setup) {
+      return msg.reply('There is no setup done yet!');
+    }
     msg.reply({
       title: 'Available "set" variables.',
       embed: {
