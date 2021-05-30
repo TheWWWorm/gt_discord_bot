@@ -46,6 +46,7 @@ export function checkCafeUrls(write = false, translated = true): Promise<CafeNew
 const cronInterval = 1e3 * 60;
 
 export function startCafeNewsCron(cb: (res: CafeNewsType) => void) {
+  checkCafeUrls(true).then(cb);
   setInterval(() => {
     checkCafeUrls(true).then(cb);
   }, cronInterval)

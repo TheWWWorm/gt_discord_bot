@@ -22,12 +22,13 @@ export function startKamazoneCron(cb: (res: number) => void) {
     }
     // Start of the day + 5:10 UTC
     roundEndDate = roundEndDate + (5 * HOUR_IN_MS + MINUTE_IN_MS * 10)
+    const diff = (roundEndDate - now) / HOUR_IN_MS;
+    logger.info(`Kamazone cron: End of the round is at ${new Date(roundEndDate).toString()}, right now it's ${new Date(now).toString()}, the time diff is ${diff} hours`);
     if (roundsEmitted.includes(String(roundEndDate))) {
       return cron;
     }
-    const diff = ((roundEndDate - now) % INTERVAL_IN_MS) / HOUR_IN_MS;
-    logger.info(`Kamazone cron: End of the round is at ${new Date(roundEndDate).toString()}, right now it's ${new Date(roundEndDate - (ALERT_BEFORE_HOURS * HOUR_IN_MS)).toString()}, the time diff is ${diff} hours`);
     if (diff <= ALERT_BEFORE_HOURS) {
+      logger.info(`Kamazone cron: ${diff} <= ${ALERT_BEFORE_HOURS}, emmiting the kamazone alert, pushing the ${roundEndDate}(${new Date(roundEndDate).toString()}) to DB`);
       roundsEmitted.push(String(roundEndDate));
       writeDB(dbName, roundsEmitted);
       cb(diff);
