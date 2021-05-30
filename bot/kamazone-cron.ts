@@ -7,7 +7,7 @@ const MINUTE_IN_MS = 1e3 * 60;
 const HOUR_IN_MS = MINUTE_IN_MS * 60;
 const INTERVAL_IN_MS = HOUR_IN_MS * 24 * 3;
 
-const ALERT_BEFORE_HOURS = 17;
+const ALERT_BEFORE_HOURS = 15;
 
 const dbName = 'kamazoneRounds';
 let roundsEmitted: Array<string> = readDB(dbName)
