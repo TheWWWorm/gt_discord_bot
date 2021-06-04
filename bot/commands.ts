@@ -189,6 +189,12 @@ const commands = {
         fields: objToEmbed(setup)
       }
     })
+  },
+  timetilreset:(msg: Discord.Message) => {
+    msg.delete();
+    const minutesInDay = new Date().getMinutes() + (new Date().getHours() * 60)
+    const timeTill = 60 * 24 - minutesInDay;
+    msg.channel.send(`Daily reset hits in ${timeTill} minutes!`)
   }
 };
 
