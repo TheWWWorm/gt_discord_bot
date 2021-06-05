@@ -1,63 +1,15 @@
 import Discord from 'discord.js';
 import { startCafeNewsCron } from '../news-check/cafe-checker';
-import { commandHandlers, createCoopRoom } from './commands';
+import { commandHandlers } from './commands';
 import client from './login';
 import log4js from 'log4js'
 import { startKamazoneCron } from './kamazone-cron';
 import config from '../config';
+import { initCommands } from './slash-cmd';
 
 const logger = log4js.getLogger('Init');
 
 logger.info('Running in prod mode - ', config.get('isProd'));
-
-// @TODO: move this to separate file and fix the broken typing
-// @NOTE: typing for commands API is lacking, so everything is more or less typed as any
-function initCommands(guildID) {
-  logger.info('Guild id is', guildID);
-  // Wrap app in fn, because we need a new instance every time
-  function getApp(guildId = guildID) {
-    const app = client['api']['applications'](client.user.id);
-    if (guildId) {
-      app.guilds(guildId);
-    }
-    return app;
-  }
-
-  function reply(interatcion, msg: string) {
-    client['api']['interactions'](interatcion.id, interatcion.token).callback.post({
-      data: {
-        type: 4,
-        data: {
-          content: msg
-        }
-      }
-    })
-  }
-
-  // Check existing commands
-  getApp().commands.get().then((cmd) => {
-    logger.info(cmd);
-    // Post new commands
-    return getApp().commands.post({
-      data: {
-        name: 'coop',
-        description: 'Create a co-op room!'
-      }
-    })
-  }).then((updated) => {
-    logger.info(updated)
-  }).catch((err) => logger.error('Errored', err));
-
-  // Listen to commands
-  client.ws.on('INTERACTION_CREATE' as any, (interatcion: any) => {
-    // @TODO: improve
-    if (interatcion.data.name === 'coop') {
-      createCoopRoom(interatcion.guild_id).then((coopResultMsg) => {
-        reply(interatcion, coopResultMsg);
-      });
-    }
-  });
-}
 
 export function start() {
   const msgStart = config.get('botPrefixes') as Array<string>
@@ -102,6 +54,7 @@ export function start() {
     client.user.setActivity(`${msgStart[0]} help`)
     logger.info(`Logged in as ${client.user.tag}!`)
     const guildIDs = config.getGuildValuePair('ID');
+    console.log(guildIDs);
     guildIDs.forEach(([guildID]) => {
       initCommands(guildID);
     });

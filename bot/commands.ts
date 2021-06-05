@@ -51,6 +51,12 @@ export const createCoopRoom = (guildId: string): Promise<string> => {
   });
 }
 
+export const timeUntilReset = () => {
+  const minutesInDay = new Date().getMinutes() + (new Date().getHours() * 60)
+  const timeTill = 60 * 24 - minutesInDay;
+  return timeTill;
+}
+
 function objToEmbed(obj): Array<EmbedFieldData> {
   return Object.keys(obj).map((key) => {
     const embed: EmbedFieldData = {
@@ -144,7 +150,9 @@ const commands = {
       if (!difficulty) {
         return msg.reply('I need a valid difficulty number!');
       }
-      msg.channel.send(`\`${genMaths(target, difficulty)}\``);
+      msg.channel.send(`\`${genMaths(target, difficulty)}\``).catch(() => {
+        msg.reply('Stop sending asking for Big Chungus formulas! Discord can\'t handle more then 2000 characters!');
+      })
     } catch (e) {
       msg.reply('Errored during formula generation!');
     }
@@ -192,10 +200,8 @@ const commands = {
   },
   timetilreset:(msg: Discord.Message) => {
     msg.delete();
-    const minutesInDay = new Date().getMinutes() + (new Date().getHours() * 60)
-    const timeTill = 60 * 24 - minutesInDay;
-    msg.channel.send(`Daily reset hits in ${timeTill} minutes!`)
-  }
+    msg.channel.send(`Daily reset hits in ${timeUntilReset()} minutes!`)
+  },
 };
 
 export const commandHandlers = commands;
