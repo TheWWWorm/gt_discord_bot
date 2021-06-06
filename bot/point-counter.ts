@@ -18,7 +18,7 @@ type GuildScore = {
 const dbName = 'hideAndSeekScores';
 let scores: Array<GuildScore> = readDB(dbName)
 
-export function addPoint(guildID, targetID) {
+export function addPoint(guildID: string, targetID: string, parsedAmount: number) {
   let guild = scores.find((guildScore) => guildScore.guildID === guildID);
   if (!guild) {
     guild = {
@@ -28,9 +28,9 @@ export function addPoint(guildID, targetID) {
     scores.push(guild);
   }
   if (guild.memberScores[targetID]) {
-    guild.memberScores[targetID] = String(Number(guild.memberScores[targetID]) + 1);
+    guild.memberScores[targetID] = String(Number(guild.memberScores[targetID]) + parsedAmount);
   } else {
-    guild.memberScores[targetID] = '1';
+    guild.memberScores[targetID] = String(parsedAmount);
   }
   writeDB(dbName, scores);
 }

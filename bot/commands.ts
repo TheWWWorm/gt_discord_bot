@@ -181,7 +181,7 @@ const commands = {
     msg.delete();
     msg.channel.send(`Daily reset hits in ${timeUntilReset()} minutes!`)
   },
-  point:(msg: Discord.Message, target: string) => {  
+  point:(msg: Discord.Message, target: string, amount = '1') => {  
     if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
@@ -190,12 +190,17 @@ const commands = {
       return msg.reply('You need to select the target to give points to')
     }
     target = exectued[1];
+    const parsedAmount = parseInt(amount)
+    if (!parsedAmount) {
+      return msg.reply('You need to enter valid amount of points to give')
+    }
+    target = exectued[1];
     const guildID = msg.guild.id;
     const channelID = config.getGuild(guildID, 'hideAndSeekChannelID');
     if (!channelID) {
       return msg.reply('Please set hideAndSeekChannelID first!');
     }
-    addPoint(guildID, target);
+    addPoint(guildID, target, parsedAmount);
     repostMessage(guildID, channelID);
   },
 };
