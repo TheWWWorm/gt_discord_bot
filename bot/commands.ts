@@ -6,22 +6,12 @@ import { checkCafeUrls } from '../news-check/cafe-checker';
 import { genMaths } from './maths';
 import log4js from 'log4js'
 import config, { configHelp } from '../config';
+import { addPoint, repostMessage } from './point-counter';
+import { getRngCalculator, objToEmbed } from '../shared/helpers';
 
 const logger = log4js.getLogger('Commands');
 
 const minutesUntilDeletion = config.get('coopMaxInaciveTime');
-
-// Function for creating rng based calculation functions
-function getRngCalculator(chance: number) {
-  return (msg: Discord.Message, rolls) => {
-    rolls = Math.floor(Number(rolls));
-    if (!rolls || rolls < 1) {
-      return msg.reply('I need a valid number of summons!');
-    }
-    const atLeast1Rng = (1 - ((100 - chance) / 100) ** rolls) * 100;
-    msg.reply(`Chance to get at least 1 white box in ${rolls} pulls is ${atLeast1Rng.toFixed(2)}%`);
-  }
-}
 
 export const createCoopRoom = (guildId: string): Promise<string> => {
   const guild = new Discord.Guild(client, {
@@ -57,16 +47,6 @@ export const timeUntilReset = () => {
   return timeTill;
 }
 
-function objToEmbed(obj): Array<EmbedFieldData> {
-  return Object.keys(obj).map((key) => {
-    const embed: EmbedFieldData = {
-      name: key,
-      value: obj[key] || 'N/A'
-    }
-    return embed
-  });
-}
-
 const guildSetOptions = Object.keys(configHelp);
 const mappedEmbed: Array<EmbedFieldData> = objToEmbed(configHelp);
 
@@ -93,7 +73,6 @@ const commands = {
   cat: (msg: Discord.Message) => {
     const guildId = msg.guild.id;
     const catRoleID = config.getGuild(guildId, 'catRoleID');
-    console.log(catRoleID)
     if (!catRoleID) {
       return;
     }
@@ -163,7 +142,7 @@ const commands = {
     msg.reply(`Dice roll result is ${Math.floor(Math.random() * (sides - min + 1)) + min}`);
   },
   set:(msg: Discord.Message, name, value: string) => {
-    if (!msg.member.hasPermission("ADMINISTRATOR")) {
+    if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
     if (!guildSetOptions.includes(name)) {
@@ -184,7 +163,7 @@ const commands = {
     })
   },
   checksetup:(msg: Discord.Message) => {
-    if (!msg.member.hasPermission("ADMINISTRATOR")) {
+    if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
     const setup = config.getFullGuildConfig(msg.guild.id);
@@ -201,6 +180,23 @@ const commands = {
   timetilreset:(msg: Discord.Message) => {
     msg.delete();
     msg.channel.send(`Daily reset hits in ${timeUntilReset()} minutes!`)
+  },
+  point:(msg: Discord.Message, target: string) => {  
+    if (!msg.member.hasPermission('ADMINISTRATOR')) {
+      return msg.reply('You need to have admin rights to use this command')
+    }
+    const exectued = /(\d+)/.exec(target)
+    if (!exectued || !exectued[1]) {
+      return msg.reply('You need to select the target to give points to')
+    }
+    target = exectued[1];
+    const guildID = msg.guild.id;
+    const channelID = config.getGuild(guildID, 'hideAndSeekChannelID');
+    if (!channelID) {
+      return msg.reply('Please set hideAndSeekChannelID first!');
+    }
+    addPoint(guildID, target);
+    repostMessage(guildID, channelID);
   },
 };
 

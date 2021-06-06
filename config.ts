@@ -7,8 +7,10 @@ type GuildConfig = {
   whaleRoleID?: string,
   whaleChannelID?: string,
   newsChannelID?: string,
-  kamazoneRoleID?: string
-  kamazoneMentionChannelID?: string
+  kamazoneRoleID?: string,
+  kamazoneMentionChannelID?: string,
+  hideAndSeekChannelID?: string,
+  hideAndSeekMsgID?: string,
 }
 
 type GuildValuePair = [string, string];
@@ -21,7 +23,9 @@ export const configHelp = {
   whaleChannelID: 'ID of a whale channel',
   newsChannelID: 'ID of a korean news channel',
   kamazoneRoleID: 'ID of role to remind about KAMA-zone',
-  kamazoneMentionChannelID: 'ID of the channel where KAMA-zone reminder will be sent'
+  kamazoneMentionChannelID: 'ID of the channel where KAMA-zone reminder will be sent',
+  hideAndSeekChannelID: 'ID of the channel with recods of hide and seek',
+  //hideAndSeekMsgID: 'ID of the message with recods of hide and seek'
 }
 
 const dbName = 'config';

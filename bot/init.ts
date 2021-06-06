@@ -54,7 +54,6 @@ export function start() {
     client.user.setActivity(`${msgStart[0]} help`)
     logger.info(`Logged in as ${client.user.tag}!`)
     const guildIDs = config.getGuildValuePair('ID');
-    console.log(guildIDs);
     guildIDs.forEach(([guildID]) => {
       initCommands(guildID);
     });
