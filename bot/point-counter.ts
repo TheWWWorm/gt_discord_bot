@@ -44,21 +44,19 @@ export function repostMessage(guildID, channelID) {
     id: channelID
   });
 
-  let guildScores = scores.find((guildScore) => guildScore.guildID === guildID).memberScores;
+  const guildScores = scores.find((guildScore) => guildScore.guildID === guildID).memberScores;
   
-  guild.fetch().then((fetchedGuild) => {
-    return Promise.all(Object.keys(guildScores).map((userID) => {
-      return new Discord.GuildMember(client, {
-        user: {
-          id: userID
-        }
-      }, fetchedGuild).fetch().catch(() => {
-        delete guildScores[userID];
-        channel.send('Errored, please try again!');
-        return Promise.reject(`Invalid user id ${userID}`);
-      });
-    }));
-  }).then((members: Array<Discord.GuildMember>) => {
+  return Promise.all(Object.keys(guildScores).map((userID) => {
+    return new Discord.GuildMember(client, {
+      user: {
+        id: userID
+      }
+    }, guild).fetch().catch(() => {
+      delete guildScores[userID];
+      channel.send('Errored, please try again!');
+      return Promise.reject(`Invalid user id ${userID}`);
+    })
+  })).then((members: Array<Discord.GuildMember>) => {
     return channel.send({
       title: 'Scores',
       embed: {
@@ -66,8 +64,15 @@ export function repostMessage(guildID, channelID) {
           const user = members[i];
           return {
             name: user.nickname || user.displayName || user.user.username,
-            value: element.value + ' points'
+            value: element.value
           };
+        }).sort((a, b) => {
+          return Number(b.value) - Number(a.value);
+        }).map((e) => {
+          return {
+            ...e,
+            value: e.value + ' points'
+          }
         })
       }
     })
