@@ -111,6 +111,8 @@ const commands = {
   bannerbox: getRngCalculator(1.375),
   exwhitebox: getRngCalculator(1 + 2),
   exbannerbox: getRngCalculator(1),
+  supercostume: getRngCalculator(1, 'super costume', 'crafts'),
+  merch: getRngCalculator(3, 'unique merch', 'crafts'),
   defence: (msg: Discord.Message, amount) => {
     amount = Math.floor(Number(amount));
     if (!amount || amount < 1) {

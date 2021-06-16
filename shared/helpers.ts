@@ -11,13 +11,13 @@ export function objToEmbed(obj): Array<EmbedFieldData> {
 }
 
 // Function for creating rng based calculation functions
-export function getRngCalculator(chance: number) {
+export function getRngCalculator(chance: number, name = 'white box', action = 'pulls') {
   return (msg: Discord.Message, rolls) => {
     rolls = Math.floor(Number(rolls));
     if (!rolls || rolls < 1) {
-      return msg.reply('I need a valid number of summons!');
+      return msg.reply(`I need a valid number of ${action}!`);
     }
     const atLeast1Rng = (1 - ((100 - chance) / 100) ** rolls) * 100;
-    msg.reply(`Chance to get at least 1 white box in ${rolls} pulls is ${atLeast1Rng.toFixed(2)}%`);
+    msg.reply(`Chance to get at least 1 ${name} in ${rolls} ${action} is ${atLeast1Rng.toFixed(2)}%`);
   }
 }
