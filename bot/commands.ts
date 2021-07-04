@@ -81,6 +81,11 @@ const commands = {
     RoleManager.add([catRoleID]).catch(logger.error);
     msg.reply('Cat alert!');
   },
+  poteto: (msg: Discord.Message) => {
+    if (msg.content.split(' ').includes('ahve')) {
+      msg.reply('🥔 alert!');
+    }
+  },
   animal: (msg, length = 3) => {
     const generated =  animalIds.generateID(length, ' ');
     if (generated.length > 1500) {

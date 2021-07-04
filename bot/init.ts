@@ -78,6 +78,8 @@ export function start() {
       // If message fits the "cat" ctiteriea, execute the cat command
       } else if (greet.length > Number(config.get('catMsgLenght')) && !/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet) && !/[\*\/\+-]/m.test(greet)) {
         commandHandlers.cat(msg);
+      } else if (!/<.*?>.*?/.test(greet) && !/http.*:\/\//.test(greet) && !/[\*\/\+-]/m.test(greet)) {
+        commandHandlers.poteto(msg);
       };
     } catch (e) {
       logger.error('Errored during msg parse', e.stack);
