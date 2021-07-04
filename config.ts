@@ -63,7 +63,7 @@ const config = {
     }, []);
   },
   setGuild: (guildId: string, name: keyof GuildConfig, value: string) => {
-    let guild = guildConfigs.find((guild) => guild.ID);
+    let guild = guildConfigs.find((guild) => guild.ID === guildId);
     if (!guild) {
       guild = {
         ID: guildId 
