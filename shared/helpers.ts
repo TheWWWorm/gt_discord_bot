@@ -21,3 +21,8 @@ export function getRngCalculator(chance: number, name = 'white box', action = 'p
     msg.reply(`Chance to get at least 1 ${name} in ${rolls} ${action} is ${atLeast1Rng.toFixed(2)}%`);
   }
 }
+
+export function randomNumber(min: number , max: number){
+  const r = Math.random() * (max - min) + min
+  return Math.floor(r)
+}

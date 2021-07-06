@@ -7,7 +7,7 @@ import { genMaths } from './maths';
 import log4js from 'log4js'
 import config, { configHelp } from '../config';
 import { addPoint, repostMessage } from './point-counter';
-import { getRngCalculator, objToEmbed } from '../shared/helpers';
+import { getRngCalculator, objToEmbed, randomNumber } from '../shared/helpers';
 
 const logger = log4js.getLogger('Commands');
 
@@ -82,8 +82,8 @@ const commands = {
     msg.reply('Cat alert!');
   },
   poteto: (msg: Discord.Message) => {
-    if (msg.content.split(' ').includes('ahve')) {
-      msg.reply('🥔 alert!');
+    if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
+      msg.reply('🥔'.repeat(randomNumber(1, 5)) + ' alert!');
     }
   },
   animal: (msg, length = 3) => {
