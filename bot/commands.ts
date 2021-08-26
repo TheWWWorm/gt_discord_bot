@@ -99,15 +99,15 @@ const commands = {
     // Get all the avalable commands from this objects keys/properties
     msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test', 'whaleCheck', 'poteto'].indexOf(name) === -1).join(', ')}`);
   },
-  botInviteLink: (msg: Discord.Message) => {
+  botinvitelink: (msg: Discord.Message) => {
     // Invite bot to your server
     msg.reply(`Bot invite link: https://discord.com/api/oauth2/authorize?client_id=835230514813730856&permissions=8&scope=bot%20applications.commands`);
   },
-  discordLink: (msg: Discord.Message) => {
+  discordlink: (msg: Discord.Message) => {
     // Join the discord
     msg.reply(`Devoleper discord link: https://discord.gg/ghFPrvAnXt`);
   },
-  coloCalcLink: (msg: Discord.Message) => {
+  colocalclink: (msg: Discord.Message) => {
     // Link to colo-calc
     msg.reply(`Check out the Colosseum calculator! https://thewwworm.github.io/`);
   },
