@@ -23,6 +23,7 @@ export function getRngCalculator(chance: number, name = 'white box', action = 'p
 }
 
 export function randomNumber(min: number , max: number){
-  const r = Math.random() * (max - min) + min
-  return Math.floor(r)
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
