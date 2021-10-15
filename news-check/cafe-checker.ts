@@ -15,7 +15,7 @@ export type CafeNewsType = {
   date: string;
 }
 
-export function checkCafeUrls(write = false, translated = true): Promise<CafeNewsType> {
+export function checkCafeUrls(write = false, translated = false): Promise<CafeNewsType> {
   return axios.get(baseUrl + gtCafeUlr, {}).then((res) => {
     const body = res.data;
     if (body) {
