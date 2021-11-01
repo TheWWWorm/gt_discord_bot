@@ -32,23 +32,25 @@ export function start() {
     }
   })
 
-  logger.info('Starting kamazone news cron');
-  startKamazoneCron((res) => {
-    if (res) {
-      const channels = config.getGuildValuePair('kamazoneMentionChannelID');
-      channels.forEach(([guildID, newsChannelID]) => {
-        const roleID = config.getGuild(guildID, 'kamazoneRoleID');
-        const msg = `${roleID ? `<@&${roleID}>` : 'Unset role!'} Don't forget to do Kama-ZONE! ${res.toFixed(1)} hours left until the round end!`;
-        const guild = new Discord.Guild(client, {
-          id: guildID
+  if (config.get('kamazoneStartDate')) {
+    logger.info('Starting kamazone news cron');
+    startKamazoneCron((res) => {
+      if (res) {
+        const channels = config.getGuildValuePair('kamazoneMentionChannelID');
+        channels.forEach(([guildID, newsChannelID]) => {
+          const roleID = config.getGuild(guildID, 'kamazoneRoleID');
+          const msg = `${roleID ? `<@&${roleID}>` : 'Unset role!'} Don't forget to do Kama-ZONE! ${res.toFixed(1)} hours left until the round end!`;
+          const guild = new Discord.Guild(client, {
+            id: guildID
+          });
+          const channel = new Discord.TextChannel(guild, {
+            id: newsChannelID
+          });
+          channel.send(msg);
         });
-        const channel = new Discord.TextChannel(guild, {
-          id: newsChannelID
-        });
-        channel.send(msg);
-      });
-    }
-  })
+      }
+    })
+  }
 
   client.on('ready', () => {
     client.user.setActivity(`${msgStart[0]} help`)
