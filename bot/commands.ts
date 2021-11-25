@@ -83,7 +83,7 @@ const commands = {
   },
   poteto: (msg: Discord.Message) => {
     if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
-      msg.reply('🥔'.repeat(randomNumber(1, 5)) + ' alert!');
+      msg.reply('🥔'.repeat(randomNumber(1, 7)) + ' alert!');
     }
   },
   animal: (msg, length = 3) => {
