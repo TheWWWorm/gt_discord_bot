@@ -83,7 +83,7 @@ const commands = {
   },
   poteto: (msg: Discord.Message) => {
     if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
-      if (msg.author.username === 'WWWorm') {
+      if (randomNumber(1, 100) === 69) {
         return msg.reply('🥔'.repeat(69));
       }
       msg.reply('🥔'.repeat(randomNumber(1, 7)) + ' alert!');
