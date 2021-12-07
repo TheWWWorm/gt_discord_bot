@@ -12,6 +12,7 @@ import { getRngCalculator, objToEmbed, randomNumber } from '../shared/helpers';
 const logger = log4js.getLogger('Commands');
 
 const minutesUntilDeletion = config.get('coopMaxInaciveTime');
+let potetoAmount = 0;
 
 export const createCoopRoom = (guildId: string): Promise<string> => {
   const guild = new Discord.Guild(client, {
@@ -83,6 +84,10 @@ const commands = {
   },
   poteto: (msg: Discord.Message) => {
     if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
+      if (msg.author.id === '231048989980622849') {
+        potetoAmount = potetoAmount + 1;
+        return msg.reply('🥔'.repeat(potetoAmount));
+      }
       if (randomNumber(1, 100) === 69) {
         return msg.reply('🥔'.repeat(69));
       }
