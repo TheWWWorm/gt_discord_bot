@@ -71,6 +71,9 @@ const commands = {
   '500€': (msg: Discord.Message) => {
     msg.reply("no");
   },
+  'kang': (msg: Discord.Message) => {
+    msg.reply('https://cdn.discordapp.com/attachments/926173405722587257/928332778460819466/unknown.png');
+  },
   cat: (msg: Discord.Message) => {
     const guildId = msg.guild.id;
     const catRoleID = config.getGuild(guildId, 'catRoleID');
