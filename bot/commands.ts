@@ -72,7 +72,12 @@ const commands = {
     msg.reply("no");
   },
   'kang': (msg: Discord.Message) => {
-    msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
+    const rng = randomNumber(1, 10);
+    if (rng < 8) {
+      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
+    } else {
+      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930141593850220635/no_more_free_kang.png');
+    }
   },
   cat: (msg: Discord.Message) => {
     const guildId = msg.guild.id;
