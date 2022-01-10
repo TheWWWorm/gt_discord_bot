@@ -72,13 +72,15 @@ const commands = {
     msg.reply("no");
   },
   'kang': (msg: Discord.Message) => {
-    const rng = randomNumber(1, 10);
-    if (rng < 4) {
+    const rng = randomNumber(1, 100);
+    if (rng < 50) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
-    } else if (rng < 6) {
+    } else if (rng < 60) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930145483605803078/free_kang_lp.png')
-    } else if (rng < 8) {
+    } else if (rng < 70) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930148374571798588/free_kang_egg.png')
+    } else if (rng < 80) {
+      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930150768680517662/free_rick_roll.png')
     } else {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930141593850220635/no_more_free_kang.png');
     }
