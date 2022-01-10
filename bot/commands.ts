@@ -73,8 +73,10 @@ const commands = {
   },
   'kang': (msg: Discord.Message) => {
     const rng = randomNumber(1, 10);
-    if (rng < 8) {
+    if (rng < 4) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
+    } else if (rng < 7) {
+      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930145483605803078/free_kang_lp.png')
     } else {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930141593850220635/no_more_free_kang.png');
     }
