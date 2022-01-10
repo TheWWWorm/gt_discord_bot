@@ -72,7 +72,7 @@ const commands = {
     msg.reply("no");
   },
   'kang': (msg: Discord.Message) => {
-    msg.reply('https://cdn.discordapp.com/attachments/926173405722587257/928332778460819466/unknown.png');
+    msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
   },
   cat: (msg: Discord.Message) => {
     const guildId = msg.guild.id;
