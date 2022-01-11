@@ -81,8 +81,10 @@ const commands = {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930148374571798588/free_kang_egg.png')
     } else if (rng < 80) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930150768680517662/free_rick_roll.png')
+    } else if (rng < 85) {
+      msg.reply('https://cdn.discordapp.com/attachments/860540258570731572/930469675039596595/kang_drip.png')
     } else if (rng < 95) {
-      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930150768680517662/free_rick_roll.png')
+      msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930141593850220635/no_more_free_kang.png')
     } else {
       msg.reply('https://cdn.discordapp.com/attachments/860540258570731572/930462437512208464/golden_kang.png');
     }
