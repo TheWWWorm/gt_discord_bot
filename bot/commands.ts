@@ -77,6 +77,8 @@ const commands = {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
     } else if (rng < 60) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930145483605803078/free_kang_lp.png')
+    } else if (rng < 65) {
+      msg.reply('https://cdn.discordapp.com/attachments/930468197893808139/932037958373109840/free_kang_lapice.png')
     } else if (rng < 70) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/930148374571798588/free_kang_egg.png')
     } else if (rng < 75) {
