@@ -17,7 +17,14 @@ export function startKamazoneCron(cb: (res: number) => void) {
   setInterval((function cron() {
     const now = +(new Date())
     let roundEndDate = seasonStartDate;
+    let nInSeason = 0;
     while (roundEndDate < now) {
+      // 9 * 3 day seasons + 1 off season day
+      if (nInSeason === 9) {
+        nInSeason = 0;
+        roundEndDate = roundEndDate + HOUR_IN_MS * 24;
+      }
+      nInSeason = nInSeason + 1;
       roundEndDate = roundEndDate + INTERVAL_IN_MS;
     }
     // Start of the day + 5:10 UTC
