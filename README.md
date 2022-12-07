@@ -20,4 +20,5 @@ $ nodemon index.ts
 ```
 This will run the bot server and will also watch the file system, automatically restarting the server if any changes are made.
 
-
+## Docker
+You can also use Docker to run the app. To do that you stil need to have `.env` localy, as it uses those params to run. Then just simply build the image and run the container.
