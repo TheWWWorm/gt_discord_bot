@@ -1,7 +1,7 @@
-import log4js from 'log4js'
+import { getLogger } from 'log4js'
 import config from '../config';
 import { readDB, writeDB } from '../db/db_helper';
-const logger = log4js.getLogger('Kamazone');
+const logger = getLogger('Kamazone');
 
 const MINUTE_IN_MS = 1e3 * 60;
 const HOUR_IN_MS = MINUTE_IN_MS * 60;

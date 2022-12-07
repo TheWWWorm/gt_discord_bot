@@ -1,8 +1,8 @@
 import axios from 'axios';
-import log4js from 'log4js'
 import { readDB, writeDB } from '../db/db_helper';
+import { getLogger } from 'log4js';
 
-const logger = log4js.getLogger('Cafe checker');
+const logger = getLogger('Cafe checker');
 
 const baseUrl = 'https://m.cafe.daum.net';
 const gtCafeUlr = '/GuardianTales/ARyY';

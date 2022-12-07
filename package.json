@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node-ts index.ts",
-    "pm2": "pm2 start index.ts --watch",
-    "tsc": "tsc src/index.ts -w & pm2 start dist/index.js --watch"
+    "pm2": "pm2 start index.js",
+    "tsc": "tsc index.ts"
   },
   "nodemonConfig": {
     "ext": "ts"

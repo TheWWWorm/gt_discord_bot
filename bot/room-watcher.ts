@@ -1,12 +1,10 @@
-import Discord from 'discord.js';
-import fs from 'fs';
-import path from 'path';
+import { Guild, TextChannel } from 'discord.js';
 import client from './login';
-import log4js from 'log4js'
+import { getLogger } from 'log4js'
 import { readDB, writeDB } from '../db/db_helper';
 import config from '../config';
 
-const logger = log4js.getLogger('Room watcher');
+const logger = getLogger('Room watcher');
 
 type Room = {
   guildId: string,
@@ -34,11 +32,11 @@ class RoomWatcher {
     try {
       // Create a guild instance
       // @NOTE: guild is the same as server, just called differently in discord api
-      const guild = new Discord.Guild(client, {
+      const guild = new Guild(client, {
         id: room.guildId
       });
       // Create a co-op channel instance
-      const channel = new Discord.TextChannel(guild, {
+      const channel = new TextChannel(guild, {
         id: room.channelId
       });
       // Create a watcher Fn to repeat

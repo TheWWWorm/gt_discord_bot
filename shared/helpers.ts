@@ -1,4 +1,4 @@
-import Discord, { EmbedFieldData } from "discord.js";
+import { EmbedFieldData, Message } from "discord.js";
 
 export function objToEmbed(obj): Array<EmbedFieldData> {
   return Object.keys(obj).map((key) => {
@@ -12,7 +12,7 @@ export function objToEmbed(obj): Array<EmbedFieldData> {
 
 // Function for creating rng based calculation functions
 export function getRngCalculator(chance: number, name = 'white box', action = 'pulls') {
-  return (msg: Discord.Message, rolls) => {
+  return (msg: Message, rolls) => {
     rolls = Math.floor(Number(rolls));
     if (!rolls || rolls < 1) {
       return msg.reply(`I need a valid number of ${action}!`);

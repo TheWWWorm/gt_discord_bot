@@ -1,12 +1,12 @@
 // READ params from .env file
-import dotenv from 'dotenv';
-dotenv.config();
-import log4js from 'log4js'
+import { config as dotEvnConfig } from 'dotenv';
+dotEvnConfig();
+import { configure } from 'log4js';
 import config from './config';
 
 process.env.TZ = 'Etc/UTC'
 
-log4js.configure({
+configure({
   appenders: {
     console: { type: 'console', layout: { type: 'colored' } },
     errFile: {

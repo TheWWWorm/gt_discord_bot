@@ -1,7 +1,7 @@
-import Discord from 'discord.js';
+import { Client } from 'discord.js';
 import config from '../config';
 
-const client = new Discord.Client();
+const client = new Client();
 const TOKEN = config.get('discordToken') as string;
 client.login(TOKEN);
 

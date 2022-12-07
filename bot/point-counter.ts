@@ -1,11 +1,11 @@
 import config from '../config';
 import { readDB, writeDB } from '../db/db_helper';
-import Discord from "discord.js";
+import { Guild, TextChannel, GuildMember, Message } from "discord.js";
 import client from './login';
 import { objToEmbed } from '../shared/helpers';
-import log4js from 'log4js'
+import { getLogger } from 'log4js'
 
-const logger = log4js.getLogger('Point Counter');
+const logger = getLogger('Point Counter');
 
 
 type GuildScore = {
@@ -37,17 +37,17 @@ export function addPoint(guildID: string, targetID: string, parsedAmount: number
 
 export function repostMessage(guildID, channelID) {
   const currentMsgID = config.getGuild(guildID, 'hideAndSeekMsgID');
-  const guild = new Discord.Guild(client, {
+  const guild = new Guild(client, {
     id: guildID
   });
-  const channel = new Discord.TextChannel(guild, {
+  const channel = new TextChannel(guild, {
     id: channelID
   });
 
   const guildScores = scores.find((guildScore) => guildScore.guildID === guildID).memberScores;
   
   return Promise.all(Object.keys(guildScores).map((userID) => {
-    return new Discord.GuildMember(client, {
+    return new GuildMember(client, {
       user: {
         id: userID
       }
@@ -56,7 +56,7 @@ export function repostMessage(guildID, channelID) {
       channel.send('Errored, please try again!');
       return Promise.reject(`Invalid user id ${userID}`);
     })
-  })).then((members: Array<Discord.GuildMember>) => {
+  })).then((members: Array<GuildMember>) => {
     return channel.send({
       title: 'Scores',
       embed: {
@@ -81,7 +81,7 @@ export function repostMessage(guildID, channelID) {
     msg.pin();
 
     if (currentMsgID) {
-      const msg = new Discord.Message(client, {
+      const msg = new Message(client, {
         id: currentMsgID
       }, channel);
       msg.delete();

@@ -1,8 +1,8 @@
-import log4js from 'log4js'
+import { getLogger } from 'log4js'
 import { createCoopRoom, timeUntilReset } from './commands';
 import client from './login';
 
-const logger = log4js.getLogger('Init');
+const logger = getLogger('Init');
 
 type Command = {
   name: string

@@ -1,32 +1,32 @@
-import Discord, { EmbedFieldData } from 'discord.js';
+import { EmbedFieldData, Guild, GuildChannelManager, Channel, Message, GuildMemberRoleManager } from 'discord.js';
 import animalIds from 'animal-ids';
 import coopWatcher from './room-watcher';
 import client from './login';
 import { checkCafeUrls } from '../news-check/cafe-checker';
 import { genMaths } from './maths';
-import log4js from 'log4js'
+import { getLogger } from 'log4js';
 import config, { configHelp } from '../config';
 import { addPoint, repostMessage } from './point-counter';
 import { getRngCalculator, objToEmbed, randomNumber } from '../shared/helpers';
 
-const logger = log4js.getLogger('Commands');
+const logger = getLogger('Commands');
 
 const minutesUntilDeletion = config.get('coopMaxInaciveTime');
 let potetoAmount = 0;
 
 export const createCoopRoom = (guildId: string): Promise<string> => {
-  const guild = new Discord.Guild(client, {
+  const guild = new Guild(client, {
     id: guildId
   });
   const coopChannelID = config.getGuild(guildId, 'coopChannelID');
   if (!coopChannelID) {
     return Promise.resolve('No coopChannelID found for this discord server! Please run the setup!');
   }
-  const guildChannelManager = new Discord.GuildChannelManager(guild);
+  const guildChannelManager = new GuildChannelManager(guild);
   const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
   // Create new co-op channel under defined catergory
   return guildChannelManager.create(roomName, {
-    parent: new Discord.Channel(client, {
+    parent: new Channel(client, {
       id: coopChannelID
     })
   }).then((ch) => {
@@ -55,23 +55,23 @@ const mappedEmbed: Array<EmbedFieldData> = objToEmbed(configHelp);
 // List of available bot commands
 // If new command added to object below, it will automatically work
 const commands = {
-  koreanews: (msg: Discord.Message) => {
+  koreanews: (msg: Message) => {
     checkCafeUrls().then((url) => {
       msg.reply(`Latest korea news, posted at ${url.date}. ${url.url}`);
     });
   },
-  coop: (msg: Discord.Message) => {
+  coop: (msg: Message) => {
     createCoopRoom(msg.guild.id).then((coopResultText) => {
       msg.reply(coopResultText);
     });
   },
-  ping: (msg: Discord.Message) => {
+  ping: (msg: Message) => {
     msg.reply("pong");
   },
-  '500€': (msg: Discord.Message) => {
+  '500€': (msg: Message) => {
     msg.reply("no");
   },
-  'kang': (msg: Discord.Message) => {
+  'kang': (msg: Message) => {
     const rng = randomNumber(1, 100);
     if (rng < 50) {
       msg.reply('https://cdn.discordapp.com/attachments/859857183625576450/929899362639835176/free_kang.png');
@@ -93,18 +93,18 @@ const commands = {
       msg.reply('https://cdn.discordapp.com/attachments/860540258570731572/930462437512208464/golden_kang.png');
     }
   },
-  cat: (msg: Discord.Message) => {
+  cat: (msg: Message) => {
     const guildId = msg.guild.id;
     const catRoleID = config.getGuild(guildId, 'catRoleID');
     if (!catRoleID) {
       return;
     }
-    const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
+    const RoleManager = new GuildMemberRoleManager(msg.member);
     // Set cat role
     RoleManager.add([catRoleID]).catch(logger.error);
     msg.reply('Cat alert!');
   },
-  poteto: (msg: Discord.Message) => {
+  poteto: (msg: Message) => {
     if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
       if (msg.author.id === '231048989980622849') {
         potetoAmount = potetoAmount + 1;
@@ -125,23 +125,23 @@ const commands = {
     }
     msg.reply(generated);
   },
-  help: (msg: Discord.Message) => {
+  help: (msg: Message) => {
     // Get all the avalable commands from this objects keys/properties
     msg.reply(`Available commads are: ${Object.keys(commands).filter((name) => ['cat', 'test', 'whaleCheck', 'poteto'].indexOf(name) === -1).join(', ')}`);
   },
-  botinvitelink: (msg: Discord.Message) => {
+  botinvitelink: (msg: Message) => {
     // Invite bot to your server
     msg.reply(`Bot invite link: https://discord.com/api/oauth2/authorize?client_id=835230514813730856&permissions=8&scope=bot%20applications.commands`);
   },
-  discordlink: (msg: Discord.Message) => {
+  discordlink: (msg: Message) => {
     // Join the discord
     msg.reply(`Devoleper discord link: https://discord.gg/ghFPrvAnXt`);
   },
-  colocalclink: (msg: Discord.Message) => {
+  colocalclink: (msg: Message) => {
     // Link to colo-calc
     msg.reply(`Check out the Colosseum calculator! https://thewwworm.github.io/`);
   },
-  whaleCheck: (msg: Discord.Message) => {
+  whaleCheck: (msg: Message) => {
     const guildId = msg.guild.id;
     const whaleChannelID = config.getGuild(guildId, 'whaleChannelID');
     const whaleRoleID = config.getGuild(guildId, 'whaleRoleID');
@@ -149,7 +149,7 @@ const commands = {
       return;
     }
     if (msg.channel.id === whaleChannelID) {
-      const RoleManager = new Discord.GuildMemberRoleManager(msg.member);
+      const RoleManager = new GuildMemberRoleManager(msg.member);
       // Set whale role
       RoleManager.add([whaleRoleID]).catch(logger.error);
     }
@@ -160,7 +160,7 @@ const commands = {
   exbannerbox: getRngCalculator(1),
   supercostume: getRngCalculator(1, 'super costume', 'crafts'),
   merch: getRngCalculator(3, 'unique merch', 'crafts'),
-  defence: (msg: Discord.Message, amount) => {
+  defence: (msg: Message, amount) => {
     amount = Math.floor(Number(amount));
     if (!amount || amount < 1) {
       return msg.reply('I need a valid number of defence!');
@@ -168,7 +168,7 @@ const commands = {
     const reduction = (1 - 1 / (amount / 100 + 1)) * 100;
     msg.reply(`With ${amount} defence, damage is reduced by ${reduction.toFixed(2)}%`);
   },
-  maths: (msg: Discord.Message, target, difficulty = 10) => {
+  maths: (msg: Message, target, difficulty = 10) => {
     try {
       target = Number(target);
       difficulty = difficulty = Math.min(Number(difficulty), 1000);
@@ -185,12 +185,12 @@ const commands = {
       msg.reply('Errored during formula generation!');
     }
   },
-  dice: (msg: Discord.Message, sides = 6, min = 1) => {
+  dice: (msg: Message, sides = 6, min = 1) => {
     sides = Number(sides);
     min = Number(min);
     msg.reply(`Dice roll result is ${Math.floor(Math.random() * (sides - min + 1)) + min}`);
   },
-  set:(msg: Discord.Message, name, value: string) => {
+  set:(msg: Message, name, value: string) => {
     if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
@@ -203,7 +203,7 @@ const commands = {
     config.setGuild(msg.guild.id, name, value);
     msg.react('✅');
   },
-  setup:(msg: Discord.Message) => {
+  setup:(msg: Message) => {
     msg.reply({
       title: 'Available "set" variables.',
       embed: {
@@ -211,7 +211,7 @@ const commands = {
       }
     })
   },
-  checksetup:(msg: Discord.Message) => {
+  checksetup:(msg: Message) => {
     if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
@@ -226,11 +226,11 @@ const commands = {
       }
     })
   },
-  timetilreset:(msg: Discord.Message) => {
+  timetilreset:(msg: Message) => {
     msg.delete();
     msg.channel.send(`Daily reset hits in ${timeUntilReset()} minutes!`)
   },
-  point:(msg: Discord.Message, target: string, amount = '1') => {  
+  point:(msg: Message, target: string, amount = '1') => {  
     if (!msg.member.hasPermission('ADMINISTRATOR')) {
       return msg.reply('You need to have admin rights to use this command')
     }
