@@ -22,3 +22,12 @@ This will run the bot server and will also watch the file system, automatically 
 
 ## Docker
 You can also use Docker to run the app. To do that you stil need to have `.env` localy, as it uses those params to run. Then just simply build the image and run the container.
+
+# PM2 localy
+So, you just don't want to mess with Docker and just want to enjoy the features of PM2? No problem. Do
+```
+$ npm install -g pm2
+$ npm run tsc
+$ pm2 start index.js
+```
+You are done! Process should be running in the background
