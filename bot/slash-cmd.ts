@@ -1,5 +1,5 @@
 import { getLogger } from 'log4js'
-import { createCoopRoom, timeUntilReset } from './commands';
+import { timeUntilReset } from './commands';
 import client from './login';
 
 const logger = getLogger('Init');
@@ -10,10 +10,6 @@ type Command = {
 }
 
 const commands: Array<Command> = [
-  {
-    name: 'coop',
-    description: 'Create a co-op room!'
-  },
   {
     name: 'untilreset',
     description: 'Get time until the daily reset'
@@ -61,11 +57,6 @@ export function initCommands(guildID) {
   // Listen to commands
   client.ws.on('INTERACTION_CREATE' as any, (interatcion: any) => {
     // @TODO: improve
-    if (interatcion.data.name === 'coop') {
-      createCoopRoom(interatcion.guild_id).then((coopResultMsg) => {
-        reply(interatcion, coopResultMsg);
-      });
-    }
     if (interatcion.data.name === 'untilreset') {
       reply(interatcion, `Daily reset hits in ${timeUntilReset()} minutes!`)
     }

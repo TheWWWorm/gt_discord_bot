@@ -1,46 +1,15 @@
 import { EmbedFieldData, Guild, GuildChannelManager, Channel, Message, GuildMemberRoleManager } from 'discord.js';
 import animalIds from 'animal-ids';
-import coopWatcher from './room-watcher';
 import client from './login';
 import { checkCafeUrls } from '../news-check/cafe-checker';
 import { genMaths } from './maths';
 import { getLogger } from 'log4js';
 import config, { configHelp } from '../config';
-import { addPoint, repostMessage } from './point-counter';
 import { getRngCalculator, objToEmbed, randomNumber } from '../shared/helpers';
 
 const logger = getLogger('Commands');
 
-const minutesUntilDeletion = config.get('coopMaxInaciveTime');
 let potetoAmount = 0;
-
-export const createCoopRoom = (guildId: string): Promise<string> => {
-  const guild = new Guild(client, {
-    id: guildId
-  });
-  const coopChannelID = config.getGuild(guildId, 'coopChannelID');
-  if (!coopChannelID) {
-    return Promise.resolve('No coopChannelID found for this discord server! Please run the setup!');
-  }
-  const guildChannelManager = new GuildChannelManager(guild);
-  const roomName = `🤝co-op-${animalIds.generateID(2, '-')}`;
-  // Create new co-op channel under defined catergory
-  return guildChannelManager.create(roomName, {
-    parent: new Channel(client, {
-      id: coopChannelID
-    })
-  }).then((ch) => {
-    // Initiate the room watcher, so it will get deleted after some time of inactivity
-    coopWatcher.addRoom({
-      channelId: ch.id,
-      guildId: ch.guild.id
-    });
-    return `Room created with name <#${ch.id}>! Room will be deleted after ${minutesUntilDeletion} minutes of inactivity!`;
-  }).catch((err) => {
-    logger.error(err);
-    return 'Errored during room creation!';
-  });
-}
 
 export const timeUntilReset = () => {
   const minutesInDay = new Date().getMinutes() + (new Date().getHours() * 60)
@@ -58,11 +27,6 @@ const commands = {
   koreanews: (msg: Message) => {
     checkCafeUrls().then((url) => {
       msg.reply(`Latest korea news, posted at ${url.date}. ${url.url}`);
-    });
-  },
-  coop: (msg: Message) => {
-    createCoopRoom(msg.guild.id).then((coopResultText) => {
-      msg.reply(coopResultText);
     });
   },
   ping: (msg: Message) => {
@@ -92,17 +56,6 @@ const commands = {
     } else {
       msg.reply('https://cdn.discordapp.com/attachments/860540258570731572/930462437512208464/golden_kang.png');
     }
-  },
-  cat: (msg: Message) => {
-    const guildId = msg.guild.id;
-    const catRoleID = config.getGuild(guildId, 'catRoleID');
-    if (!catRoleID) {
-      return;
-    }
-    const RoleManager = new GuildMemberRoleManager(msg.member);
-    // Set cat role
-    RoleManager.add([catRoleID]).catch(logger.error);
-    msg.reply('Cat alert!');
   },
   poteto: (msg: Message) => {
     if (msg.content.split(' ').find((word) => word.toLowerCase().includes('ahv'))) {
@@ -229,28 +182,6 @@ const commands = {
   timetilreset:(msg: Message) => {
     msg.delete();
     msg.channel.send(`Daily reset hits in ${timeUntilReset()} minutes!`)
-  },
-  point:(msg: Message, target: string, amount = '1') => {  
-    if (!msg.member.hasPermission('ADMINISTRATOR')) {
-      return msg.reply('You need to have admin rights to use this command')
-    }
-    const exectued = /(\d+)/.exec(target)
-    if (!exectued || !exectued[1]) {
-      return msg.reply('You need to select the target to give points to')
-    }
-    target = exectued[1];
-    const parsedAmount = parseInt(amount)
-    if (!parsedAmount) {
-      return msg.reply('You need to enter valid amount of points to give')
-    }
-    target = exectued[1];
-    const guildID = msg.guild.id;
-    const channelID = config.getGuild(guildID, 'hideAndSeekChannelID');
-    if (!channelID) {
-      return msg.reply('Please set hideAndSeekChannelID first!');
-    }
-    addPoint(guildID, target, parsedAmount);
-    repostMessage(guildID, channelID);
   },
 };
 
