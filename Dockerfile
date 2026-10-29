@@ -1,20 +1,19 @@
-# Stage 1
-FROM node:16 as node
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tsconfig.json tsconfig.build.json ./
+COPY src ./src
+RUN npm run build
 
-# use changes to package.json to force Docker not to use the cache
-# when we change our application's nodejs dependencies:
-COPY package.json /tmp/package.json
-RUN cd /tmp && npm install
-RUN npm install -g ts-node
-RUN npm install -g pm2
-RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
-
-# From here we load our application's code in, therefore the previous docker
-# "layer" thats been cached will be used if possible
-WORKDIR /opt/app
-COPY . /opt/app
-WORKDIR /opt/app
-
-RUN npm run tsc
-# RUN npm run pm2
-CMD ["pm2-runtime", "index.js"]
+FROM node:24-alpine
+ENV NODE_ENV=production
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build /app/dist ./dist
+# Bot data (guild configs, seen news) is stored in db/bases, mount a volume there to keep it
+RUN mkdir -p db/bases && chown -R node:node /app
+USER node
+VOLUME /app/db/bases
+CMD ["node", "dist/index.js"]
